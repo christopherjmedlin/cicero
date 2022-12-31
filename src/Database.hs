@@ -25,10 +25,14 @@ Verb
   firstPresentActiveIndicative Text
   activeInfinitive             Text
   firstPerfectActiveIndicative Text
-  supine                       Text
+  supine                       Text Maybe
   deponent                     Bool
 |]
 
 initDb :: IO ()
 initDb = runSqlite ":memory:" $ runMigration migrateTables
 
+insertVerb :: Noun -> IO ()
+insertVerb noun = do
+  x <- runSqlite ":memory:" (insert noun)
+  return ()
