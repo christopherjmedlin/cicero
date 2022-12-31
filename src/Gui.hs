@@ -8,11 +8,11 @@ import qualified GI.Gtk as Gtk
 mkFlowBox :: IO (Gtk.FlowBox)
 mkFlowBox = do
   fb <- new Gtk.FlowBox [#orientation := Gtk.OrientationVertical]
-  tf1 <- new Gtk.Entry []
-  tf2 <- new Gtk.Entry []
-  tf3 <- new Gtk.Entry []
-  tf4 <- new Gtk.Entry []
-  button <- new Gtk.Button []
+  tf1 <- new Gtk.Entry [#placeholderText := "1st Principal Part"]
+  tf2 <- new Gtk.Entry [#placeholderText := "2nd Principal Part"]
+  tf3 <- new Gtk.Entry [#placeholderText := "3rd Principal Part"]
+  tf4 <- new Gtk.Entry [#placeholderText := "4th Principal Part"]
+  button <- new Gtk.Button [#label := "Add word"]
   #add fb tf1
   #add fb tf2
   #add fb tf3
