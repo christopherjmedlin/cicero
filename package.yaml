@@ -23,6 +23,10 @@ dependencies:
 - base >= 4.7 && < 5
 - gi-gtk
 - haskell-gi-base
+- esqueleto
+- persistent
+- text
+- persistent-sqlite
 
 ghc-options:
 - -Wall
