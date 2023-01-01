@@ -4,11 +4,27 @@ module Gui (mkWindow) where
 
 import Data.GI.Base
 import qualified GI.Gtk as Gtk
+import Database
+import Data.Text
+import Data.String
 
+getVerb :: [Gtk.Entry] -> IO (Verb)
+getVerb entries = do
+  texts <- traverse ((flip get) #text) entries
+  return $ Verb (texts !! 0)
+                (texts !! 1)
+                (texts !! 2)
+                (Just $ texts !! 3)
+                False
+    
+-- fields are the Gtk.Entry text fields that will be used in making
+-- a database entry, which will be cleared afterwards
 mkButton :: [Gtk.Entry] -> IO (Gtk.Button)
 mkButton fields = do
   button <- new Gtk.Button [#label := "Add word"]
   on button #clicked $ do
+    verb <- getVerb fields
+    insertVerb verb
     traverse ((flip set) [#text := ""]) fields
     return ()
   return button

@@ -7,7 +7,8 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-module Database where
+module Database (Verb, Noun, insertVerb, insertNoun,
+                 Verb(Verb), Noun(Noun), initDb) where
 
 import Database.Esqueleto
 import qualified Database.Persist as P
@@ -17,11 +18,11 @@ import Data.Word (Word8)
 import Database.Persist.Sqlite
 
 share [mkPersist sqlSettings, mkMigrate "migrateTables"] [persistLowerCase|
-Noun
+Noun sql=nouns
   nominativeSingular Text
   genitiveSingular   Text
   gender             Word8
-Verb
+Verb sql=verbs
   firstPresentActiveIndicative Text
   activeInfinitive             Text
   firstPerfectActiveIndicative Text
@@ -30,9 +31,15 @@ Verb
 |]
 
 initDb :: IO ()
-initDb = runSqlite ":memory:" $ runMigration migrateTables
+initDb = runSqlite "/home/cmedlin/.lexicon/lexicon.db"
+         $ runMigration migrateTables
 
-insertVerb :: Noun -> IO ()
-insertVerb noun = do
-  x <- runSqlite ":memory:" (insert noun)
+insertNoun :: Noun -> IO ()
+insertNoun noun = do
+  x <- runSqlite "/home/cmedlin/.lexicon/lexicon.db" (insert noun)
+  return ()
+
+insertVerb :: Verb -> IO ()
+insertVerb verb = do
+  x <- runSqlite "/home/cmedlin/.lexicon/lexicon.db" (insert verb)
   return ()
