@@ -16,23 +16,25 @@ getVerb entries = do
                 (texts !! 2)
                 (Just $ texts !! 3)
                 False
+
+insertVerbFromFields fields = do
+  verb <- getVerb fields
+  insertVerb verb
+  traverse ((flip set) [#text := ""]) fields
+  Gtk.widgetGrabFocus (fields !! 0)
+  return ()
     
 -- fields are the Gtk.Entry text fields that will be used in making
 -- a database entry, which will be cleared afterwards
 mkButton :: [Gtk.Entry] -> IO (Gtk.Button)
 mkButton fields = do
   button <- new Gtk.Button [#label := "Add word"]
-  on button #clicked $ do
-    verb <- getVerb fields
-    insertVerb verb
-    traverse ((flip set) [#text := ""]) fields
-    return ()
+  on button #clicked $ insertVerbFromFields fields
   return button
 
 -- returns several Entry objects such that when return is pressed
 -- in one, the next is focused
 linkedTextFields :: Int -> IO ([Gtk.Entry])
---linkedTextFields n = (:) <$> fst <*> (fst >>= go (n-1))
 linkedTextFields k = do
   fst <- new Gtk.Entry []
   tfs <- go (k-1) fst
@@ -50,6 +52,7 @@ mkVerbBox :: IO (Gtk.Box)
 mkVerbBox = do
   fb <- new Gtk.Box [#orientation := Gtk.OrientationVertical]
   tfs <- linkedTextFields 4
+  on (tfs !! 3) #activate $ insertVerbFromFields tfs
   traverse ((flip set) [#placeholderText := "Enter Principal Part"]) tfs
   traverse (#add fb) tfs
   button <- mkButton tfs
@@ -70,8 +73,6 @@ mkWindow = do
   win <- new Gtk.Window [#title := "Latin Lexicon"]
   on win #destroy Gtk.mainQuit
   #resize win 400 400
-
   stack <- mkStack
   #add win stack
-
   return win
