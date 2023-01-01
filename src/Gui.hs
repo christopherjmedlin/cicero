@@ -29,9 +29,9 @@ mkButton fields = do
     return ()
   return button
   
-mkFlowBox :: IO (Gtk.FlowBox)
-mkFlowBox = do
-  fb <- new Gtk.FlowBox [#orientation := Gtk.OrientationVertical]
+mkVerbBox :: IO (Gtk.Box)
+mkVerbBox = do
+  fb <- new Gtk.Box [#orientation := Gtk.OrientationVertical]
   tf1 <- new Gtk.Entry [#placeholderText := "1st Principal Part"]
   tf2 <- new Gtk.Entry [#placeholderText := "2nd Principal Part"]
   tf3 <- new Gtk.Entry [#placeholderText := "3rd Principal Part"]
@@ -44,13 +44,22 @@ mkFlowBox = do
   #add fb button
   return fb
 
+mkStack :: IO (Gtk.Stack)
+mkStack = do
+  stack <- new Gtk.Stack []
+  vb <- mkVerbBox
+  #add stack vb
+  set stack [#visibleChild := vb,
+             #transitionType := Gtk.StackTransitionTypeSlideRight]
+  return stack
+
 mkWindow :: IO (Gtk.Window)
 mkWindow = do
   win <- new Gtk.Window [#title := "Latin Lexicon"]
   on win #destroy Gtk.mainQuit
-  #resize win 640 480
+  #resize win 400 400
 
-  fb <- mkFlowBox
-  #add win fb
+  stack <- mkStack
+  #add win stack
 
   return win
