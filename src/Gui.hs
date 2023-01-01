@@ -59,12 +59,24 @@ mkVerbBox = do
   #add fb button
   return fb
 
+mkSelectionBox :: IO (Gtk.Box)
+mkSelectionBox = do
+  b <- new Gtk.Box [#orientation := Gtk.OrientationVertical]
+  combo <- Gtk.comboBoxTextNew
+  traverse (Gtk.comboBoxTextAppend combo Nothing) ["Noun", "Verb", "Adjective", "Adverb"]
+  but <- new Gtk.Button [#label := "Select"]
+  #add b combo
+  #add b but
+  return b
+
 mkStack :: IO (Gtk.Stack)
 mkStack = do
   stack <- new Gtk.Stack []
   vb <- mkVerbBox
+  sb <- mkSelectionBox
+  #add stack sb
   #add stack vb
-  set stack [#visibleChild := vb,
+  set stack [#visibleChild := sb,
              #transitionType := Gtk.StackTransitionTypeSlideRight]
   return stack
 
