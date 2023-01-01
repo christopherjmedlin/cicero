@@ -59,12 +59,14 @@ mkVerbBox = do
   #add fb button
   return fb
 
-mkSelectionBox :: IO (Gtk.Box)
-mkSelectionBox = do
+mkSelectionBox :: Gtk.Stack -> IO (Gtk.Box)
+mkSelectionBox stack = do
   b <- new Gtk.Box [#orientation := Gtk.OrientationVertical]
   combo <- Gtk.comboBoxTextNew
-  traverse (Gtk.comboBoxTextAppend combo Nothing) ["Noun", "Verb", "Adjective", "Adverb"]
+  mapM_ (#append combo Nothing) ["Noun", "Verb", "Adjective", "Adverb"]
   but <- new Gtk.Button [#label := "Select"]
+  on but #clicked $ do
+    set stack [#visibleChildName := "verb"]
   #add b combo
   #add b but
   return b
@@ -73,11 +75,11 @@ mkStack :: IO (Gtk.Stack)
 mkStack = do
   stack <- new Gtk.Stack []
   vb <- mkVerbBox
-  sb <- mkSelectionBox
-  #add stack sb
-  #add stack vb
-  set stack [#visibleChild := sb,
-             #transitionType := Gtk.StackTransitionTypeSlideRight]
+  sb <- mkSelectionBox stack
+  #addNamed stack sb "selection"
+  #addNamed stack vb "verb"
+  set stack [#visibleChildName := "verb",
+             #transitionType := Gtk.StackTransitionTypeSlideDown]
   return stack
 
 mkWindow :: IO (Gtk.Window)
@@ -87,4 +89,5 @@ mkWindow = do
   #resize win 400 400
   stack <- mkStack
   #add win stack
+  Gtk.stackSetVisibleChildName stack "verb"
   return win
