@@ -28,19 +28,31 @@ mkButton fields = do
     traverse ((flip set) [#text := ""]) fields
     return ()
   return button
-  
+
+-- returns several Entry objects such that when return is pressed
+-- in one, the next is focused
+linkedTextFields :: Int -> IO ([Gtk.Entry])
+--linkedTextFields n = (:) <$> fst <*> (fst >>= go (n-1))
+linkedTextFields k = do
+  fst <- new Gtk.Entry []
+  tfs <- go (k-1) fst
+  return (fst : tfs)
+  where
+    go 0 prev = return []
+    go n prev = do
+      tf <- new Gtk.Entry []
+      on prev #activate $ do
+        Gtk.widgetGrabFocus tf
+      tfs <- go (n-1) tf
+      return (tf : tfs)
+
 mkVerbBox :: IO (Gtk.Box)
 mkVerbBox = do
   fb <- new Gtk.Box [#orientation := Gtk.OrientationVertical]
-  tf1 <- new Gtk.Entry [#placeholderText := "1st Principal Part"]
-  tf2 <- new Gtk.Entry [#placeholderText := "2nd Principal Part"]
-  tf3 <- new Gtk.Entry [#placeholderText := "3rd Principal Part"]
-  tf4 <- new Gtk.Entry [#placeholderText := "4th Principal Part"]
-  button <- mkButton [tf1, tf2, tf3, tf4]
-  #add fb tf1
-  #add fb tf2
-  #add fb tf3
-  #add fb tf4
+  tfs <- linkedTextFields 4
+  traverse ((flip set) [#placeholderText := "Enter Principal Part"]) tfs
+  traverse (#add fb) tfs
+  button <- mkButton tfs
   #add fb button
   return fb
 
